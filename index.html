@@ -707,6 +707,7 @@ html.is-mobile-view header a[href="admin.html"]{
   min-width:26px;
   border-radius:6px;
   flex-shrink:0;
+
 }
 
 html.is-mobile-view main{
@@ -813,6 +814,67 @@ html.is-mobile-view .hero-shell{
     min-height:auto;
   }
 }
+
+/* ===================== TOAST NOTIFICATIONS ===================== */
+#toast{
+  position:fixed;
+  top:88px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:10000;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  pointer-events:none;
+  max-width:calc(100vw - 32px);
+}
+.toast-item{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding:12px 20px;
+  border-radius:12px;
+  font-weight:700;
+  font-size:14px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.5);
+  animation:toast-in 0.35s cubic-bezier(.2,.9,.3,1.2) forwards;
+  pointer-events:auto;
+  backdrop-filter:blur(6px);
+  font-family:'Tajawal','Cairo',sans-serif;
+  line-height:1.4;
+}
+.toast-success{
+  background:linear-gradient(135deg,rgba(22,163,74,0.95),rgba(21,128,61,0.95));
+  color:#fff;
+  border:1px solid #22c55e;
+  box-shadow:0 8px 28px rgba(22,163,74,0.35);
+}
+.toast-error{
+  background:linear-gradient(135deg,rgba(220,38,38,0.95),rgba(153,27,27,0.95));
+  color:#fff;
+  border:1px solid #ef4444;
+  box-shadow:0 8px 28px rgba(220,38,38,0.35);
+}
+.toast-item .icon{
+  font-family:'Material Symbols Outlined';
+  font-variation-settings:'FILL' 1;
+  font-size:20px;
+  flex-shrink:0;
+}
+@keyframes toast-in{
+  0%{opacity:0;transform:translateY(-22px) scale(0.9);}
+  60%{transform:translateY(3px) scale(1.01);}
+  100%{opacity:1;transform:translateY(0) scale(1);}
+}
+
+/* ===================== ORDER MODAL ENFORCEMENT ===================== */
+#order-modal{will-change:opacity, transform; transition:opacity 0.25s ease-out;}
+#order-modal.modal-open{display:flex !important; opacity:1;}
+#order-modal .bg-surface-container{transform:translateY(10px); transition:transform 0.28s cubic-bezier(.2,.9,.3,1.2);}
+#order-modal.modal-open .bg-surface-container{transform:translateY(0);}
+.no-scrollbar::-webkit-scrollbar{display:none;}
+.no-scrollbar{-ms-overflow-style:none; scrollbar-width:none;}
+.animate-fade-in{animation:toast-in 0.4s ease-out forwards;}
 </style>
 <script>
 (function(){
@@ -886,18 +948,18 @@ html.is-mobile-view .hero-shell{
 </div>
 
 <!-- ===================== ORDER MODAL ===================== -->
-<div id="order-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-black/80">
-  <div class="bg-surface-container max-w-md w-full rounded-lg border border-primary/30 p-6 md:p-8 relative leather-grain shadow-2xl">
+<div id="order-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-black/80" style="opacity:0;">
+  <div class="bg-surface-container max-w-md w-full rounded-lg border border-primary/30 p-6 md:p-8 relative leather-grain shadow-2xl" onclick="event.stopPropagation();">
     <div class="flex justify-between items-start mb-6">
       <div>
         <span data-i18n="modal_new_order" class="font-label-caps text-[11px] text-primary tracking-widest uppercase">طلب وجبة جديدة</span>
         <h3 class="font-headline-md text-[24px] text-on-surface mt-1" id="modal-dish-name">اسم الطبق</h3>
       </div>
-      <button onclick="closeOrderModal()" class="text-on-surface-variant hover:text-primary transition-colors">
+      <button onclick="event.preventDefault(); closeOrderModal();" class="text-on-surface-variant hover:text-primary transition-colors w-9 h-9 flex items-center justify-center rounded-md hover:bg-surface-container-low">
         <span class="material-symbols-outlined">close</span>
       </button>
     </div>
-    <form id="client-order-form" class="flex flex-col gap-4">
+    <form id="client-order-form" class="flex flex-col gap-4" novalidate>
       <input type="hidden" id="modal-dish-id"/>
       <div class="flex flex-col gap-1">
         <label data-i18n="modal_full_name" class="text-[11px] font-label-caps text-primary/80 uppercase">الاسم الكامل</label>
@@ -928,11 +990,14 @@ html.is-mobile-view .hero-shell{
           <div data-i18n="modal_total" class="text-[10px] text-on-surface-variant">السعر الإجمالي</div>
           <div class="text-[20px] font-headline-md text-primary" id="modal-total-price">0 ج.م</div>
         </div>
-        <button type="submit" data-i18n="modal_confirm" class="bg-primary text-on-primary px-8 py-3 font-label-caps text-label-caps rounded-sm hover:bg-primary-fixed transition-all shadow-[0_0_15px_rgba(242,202,80,0.2)] uppercase">تأكيد الطلب</button>
+        <button type="submit" id="order-submit-btn" data-i18n="modal_confirm" class="bg-primary text-on-primary px-8 py-3 font-label-caps text-label-caps rounded-sm hover:bg-primary-fixed transition-all shadow-[0_0_15px_rgba(242,202,80,0.2)] uppercase">تأكيد الطلب</button>
       </div>
     </form>
   </div>
 </div>
+
+<!-- ===================== TOAST CONTAINER ===================== -->
+<div id="toast"></div>
 
 
 <!-- ================================================================== -->
@@ -1022,7 +1087,61 @@ html.is-mobile-view .hero-shell{
 const getList = (k) => JSON.parse(localStorage.getItem(k) || '[]');
 const getObj  = (k) => JSON.parse(localStorage.getItem(k) || '{}');
 const setList = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+const setObj  = (k, v) => localStorage.setItem(k, JSON.stringify(v));
 const esc = (s) => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+// ─── GLOBAL: Localized text picker (used by renderMenu + modal) ────────────
+function pickLocalizedText(primary, secondary, fallback = '') {
+  const normalize = (value) => typeof value === 'string' ? value.trim() : (value ?? '');
+  const primaryValue = normalize(primary);
+  if (primaryValue) return primaryValue;
+  const secondaryValue = normalize(secondary);
+  if (secondaryValue) return secondaryValue;
+  return normalize(fallback);
+}
+window.pickLocalizedText = pickLocalizedText;
+
+// ─── GLOBAL: Toast Notification System ─────────────────────────────────────
+function showToast(message, type = 'success', durationMs = 4200) {
+  const container = document.getElementById('toast');
+  if (!container) return;
+  try {
+    const t = document.createElement('div');
+    const cls = type === 'error' ? 'toast-error' : 'toast-success';
+    const icon = type === 'error' ? 'error' : 'check_circle';
+    t.className = `toast-item ${cls}`;
+    t.innerHTML = `<span class="icon">${icon}</span><span>${String(message)}</span>`;
+    container.appendChild(t);
+    setTimeout(() => {
+      t.style.transition = 'all 0.35s ease';
+      t.style.opacity = '0';
+      t.style.transform = 'translateY(-26px) scale(0.92)';
+    }, durationMs - 500);
+    setTimeout(() => { if (t.parentNode) t.remove(); }, durationMs + 50);
+  } catch (e) { /* ignore */ }
+}
+window.showToast = showToast;
+
+// ─── API Helper with graceful offline fallback ─────────────────────────────
+const API_BASE = typeof window.API_BASE_URL !== 'undefined' ? window.API_BASE_URL : 'http://localhost:8000/api';
+
+async function submitToApi(endpoint, payload, method = 'POST') {
+  try {
+    const res = await fetch(`${API_BASE}${endpoint}`, {
+      method,
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      try { const e = await res.json(); return { ok: false, error: e || { message: `HTTP ${res.status}` } }; }
+      catch { return { ok: false, error: { message: `HTTP ${res.status}` } }; }
+    }
+    const data = await res.json().catch(() => null);
+    return { ok: true, data };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? { message: e.message } : e };
+  }
+}
 
 // ─── BILINGUAL I18N DICTIONARY (Brand name is ALWAYS EAST AND WEST) ───────────
 const i18n = {
@@ -1171,15 +1290,6 @@ function renderMenu() {
   const lang = currentLang;
   const dict = i18n[lang] || i18n.ar;
 
-  const pickLocalizedText = (primary, secondary, fallback = '') => {
-    const normalize = (value) => typeof value === 'string' ? value.trim() : (value ?? '');
-    const primaryValue = normalize(primary);
-    if (primaryValue) return primaryValue;
-    const secondaryValue = normalize(secondary);
-    if (secondaryValue) return secondaryValue;
-    return normalize(fallback);
-  };
-
   const getDishName = (d) => lang === 'ar'
     ? pickLocalizedText(d.name_ar, d.name_en, d.name)
     : pickLocalizedText(d.name_en, d.name_ar, d.name);
@@ -1261,137 +1371,282 @@ function renderMenu() {
 let selectedDish = null;
 
 function openOrderModalById(id) {
-  const dishes = getList('ew_dishes');
-  selectedDish = dishes.find(d => d.id == id);
-  if (!selectedDish) return;
-
-  document.getElementById('modal-dish-id').value = selectedDish.id;
-  const dishName = currentLang === 'ar'
-    ? pickLocalizedText(selectedDish.name_ar, selectedDish.name_en, selectedDish.name)
-    : pickLocalizedText(selectedDish.name_en, selectedDish.name_ar, selectedDish.name);
-  document.getElementById('modal-dish-name').textContent = dishName;
-  document.getElementById('order-qty').value = 1;
-  document.getElementById('order-notes').value = '';
-
-  // Load Tables Options from localStorage
-  let tables = getList('ew_tables');
-  if (!tables || !tables.length) {
-    tables = [];
-    for (let i = 1; i <= 20; i++) {
-      tables.push({id: i, table_number: `طاولة ${i}`});
+  try {
+    const dishes = getList('ew_dishes');
+    const dish = dishes.find(d => d.id == id);
+    if (!dish) {
+      showToast('عذراً، لم يتم العثور على هذه الوجبة', 'error');
+      return;
     }
-  }
+    selectedDish = dish;
 
-  // Detect table from URL parameter ?table= or ?table_id= with EXACT matching
-  const urlParams = new URLSearchParams(window.location.search);
-  const tableParam = (urlParams.get('table') || urlParams.get('table_id') || '').trim();
+    const dishNameEl = document.getElementById('modal-dish-name');
+    if (dishNameEl) {
+      const dishName = currentLang === 'ar'
+        ? pickLocalizedText(dish.name_ar, dish.name_en, dish.name)
+        : pickLocalizedText(dish.name_en, dish.name_ar, dish.name);
+      dishNameEl.textContent = dishName;
+    }
+    const hidEl = document.getElementById('modal-dish-id');
+    if (hidEl) hidEl.value = dish.id;
 
-  let matchedTableId = null;
-  if (tableParam) {
-    const targetDigits = tableParam.replace(/[^0-9]/g, '');
-    const matched = tables.find(t => {
-      if (String(t.id) === tableParam) return true;
-      if (t.table_number.trim() === tableParam) return true;
-      if (targetDigits !== '') {
-        const tableDigits = String(t.table_number).replace(/[^0-9]/g, '');
-        if (tableDigits === targetDigits) return true;
+    const qtyEl = document.getElementById('order-qty');
+    if (qtyEl) qtyEl.value = 1;
+    const notesEl = document.getElementById('order-notes');
+    if (notesEl) notesEl.value = '';
+    const nameEl = document.getElementById('order-name');
+    if (nameEl && !nameEl.value) nameEl.value = '';
+    const phoneEl = document.getElementById('order-phone');
+    if (phoneEl && !phoneEl.value) phoneEl.value = '';
+
+    // Load & populate Tables Options
+    let tables = getList('ew_tables');
+    if (!tables || !tables.length) {
+      tables = [];
+      for (let i = 1; i <= 20; i++) {
+        tables.push({id: i, table_number: `طاولة ${i}`, capacity: (i % 2 === 0 ? 4 : 2), status: 'available'});
       }
-      return false;
+      setList('ew_tables', tables);
+    }
+
+    // Detect table from URL ?table= / ?table_id=
+    const urlParams = new URLSearchParams(window.location.search);
+    const tableParam = (urlParams.get('table') || urlParams.get('table_id') || '').trim();
+    let matchedTableId = null;
+    if (tableParam) {
+      const targetDigits = tableParam.replace(/[^0-9]/g, '');
+      const matched = tables.find(t => {
+        if (String(t.id) === tableParam) return true;
+        if (String(t.table_number || '').trim() === tableParam) return true;
+        if (targetDigits !== '') {
+          const tDigits = String(t.table_number || '').replace(/[^0-9]/g, '');
+          if (tDigits === targetDigits) return true;
+        }
+        return false;
+      });
+      if (matched) matchedTableId = matched.id;
+    }
+
+    const tableSelect = document.getElementById('order-table');
+    if (tableSelect) {
+      const dict = i18n[currentLang] || i18n.ar;
+      const deliveryOpt = `<option value="">${dict.modal_delivery || 'توصيل خارجي / دليفري'}</option>`;
+      tableSelect.innerHTML = deliveryOpt + tables.map(t => {
+        const sel = matchedTableId !== null && (t.id == matchedTableId);
+        return `<option value="${t.id}" ${sel ? 'selected' : ''}>${esc(t.table_number || `طاولة ${t.id}`)}</option>`;
+      }).join('');
+    }
+
+    updateModalTotal();
+
+    // === FORCE SHOW MODAL (multiple defense layers) ===
+    const modal = document.getElementById('order-modal');
+    if (!modal) return;
+    // 1. Tailwind class swap
+    modal.classList.remove('hidden');
+    modal.classList.add('flex', 'modal-open');
+    // 2. Inline style override (always wins over class CSS)
+    modal.style.setProperty('display', 'flex', 'important');
+    modal.style.setProperty('opacity', '1', 'important');
+    modal.style.setProperty('visibility', 'visible', 'important');
+    // 3. Small delay for transition
+    requestAnimationFrame(() => {
+      modal.style.opacity = '1';
     });
-    if (matched) matchedTableId = matched.id;
+    // 4. Attach click-outside to close (idempotent)
+    modal.onclick = (e) => { if (e.target === modal) closeOrderModal(); };
+    // 5. Escape key close (idempotent)
+    document.addEventListener('keydown', function escHandler(ev) {
+      if (ev.key === 'Escape') {
+        document.removeEventListener('keydown', escHandler);
+        closeOrderModal();
+      }
+    }, { once: true });
+
+    // Focus name field for UX
+    setTimeout(() => { try { nameEl && nameEl.focus({preventScroll:true}); } catch(_) {} }, 120);
+  } catch (err) {
+    console.error('[openOrderModalById] error:', err);
+    try { showToast('خطأ في فتح نموذج الطلب. حاول مرة أخرى.', 'error'); } catch(e){}
   }
-
-  const tableSelect = document.getElementById('order-table');
-  tableSelect.innerHTML = '<option value="">توصيل خارجي / دليفري</option>' + 
-    tables.map(t => {
-      const isSelected = matchedTableId !== null && (t.id == matchedTableId);
-      return `<option value="${t.id}" ${isSelected ? 'selected' : ''}>${esc(t.table_number)}</option>`;
-    }).join('');
-
-  updateModalTotal();
-
-  const modal = document.getElementById('order-modal');
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
 }
+window.openOrderModalById = openOrderModalById;
 
 function closeOrderModal() {
-  const modal = document.getElementById('order-modal');
-  modal.classList.remove('flex');
-  modal.classList.add('hidden');
+  try {
+    const modal = document.getElementById('order-modal');
+    if (!modal) return;
+    modal.classList.remove('flex', 'modal-open');
+    modal.classList.add('hidden');
+    modal.style.setProperty('display', 'none', 'important');
+    modal.style.setProperty('opacity', '0', 'important');
+  } catch(e) { /* ignore */ }
 }
+window.closeOrderModal = closeOrderModal;
 
 function updateModalTotal() {
-  if (!selectedDish) return;
-  const qty = parseInt(document.getElementById('order-qty').value) || 1;
-  const total = selectedDish.price * qty;
-  document.getElementById('modal-total-price').textContent = `${total.toLocaleString()} ج.م`;
+  try {
+    if (!selectedDish) return;
+    const qtyEl = document.getElementById('order-qty');
+    const totalEl = document.getElementById('modal-total-price');
+    if (!qtyEl || !totalEl) return;
+    const qty = Math.max(1, parseInt(qtyEl.value) || 1);
+    qtyEl.value = qty;
+    const total = (Number(selectedDish.price) || 0) * qty;
+    const dict = i18n[currentLang] || i18n.ar;
+    totalEl.textContent = `${total.toLocaleString()} ${dict.currency || 'ج.م'}`;
+  } catch(e) { /* ignore */ }
 }
+window.updateModalTotal = updateModalTotal;
 
-document.getElementById('order-qty').addEventListener('input', updateModalTotal);
-document.getElementById('order-qty').addEventListener('change', updateModalTotal);
+(function initQtyListenersOnce() {
+  const qtyEl = document.getElementById('order-qty');
+  if (qtyEl) {
+    const onChange = () => updateModalTotal();
+    qtyEl.removeEventListener('input', onChange);
+    qtyEl.removeEventListener('change', onChange);
+    qtyEl.addEventListener('input', onChange);
+    qtyEl.addEventListener('change', onChange);
+  }
+})();
 
 // Submit Order Form
-document.getElementById('client-order-form').addEventListener('submit', function(e) {
-  e.preventDefault();
-  if (!selectedDish) return;
-
-  const name = document.getElementById('order-name').value.trim();
-  const phone = document.getElementById('order-phone').value.trim();
-  const tableId = document.getElementById('order-table').value;
-  const qty = parseInt(document.getElementById('order-qty').value) || 1;
-  const notes = document.getElementById('order-notes').value.trim();
-
-  let tableObj = null;
-  if (tableId) {
-    const tables = getList('ew_tables');
-    const matched = tables.find(t => t.id == tableId);
-    if (matched) {
-      tableObj = { id: matched.id, table_number: matched.table_number };
+(function initOrderSubmitOnce() {
+  const form = document.getElementById('client-order-form');
+  if (!form) return;
+  // Replace any previous listener (detach+reattach = idempotent)
+  const newHandler = async function(e) {
+    e.preventDefault();
+    if (!selectedDish) {
+      showToast('لم يتم تحديد وجبة. اطلب مرة أخرى من القائمة.', 'error');
+      return;
     }
-  }
 
-  // Create Order Object
-  const newOrder = {
-    id: Date.now(),
-    order_number: `ORD-${new Date().toISOString().slice(0,10).replace(/-/g,'')}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`,
-    customer_name: name,
-    customer_phone: phone,
-    table: tableObj,
-    status: 'pending',
-    total_amount: selectedDish.price * qty,
-    created_at: new Date().toISOString(),
-    notes: notes,
-    items: [
-      {
+    const nameEl = document.getElementById('order-name');
+    const phoneEl = document.getElementById('order-phone');
+    const tableEl = document.getElementById('order-table');
+    const qtyEl = document.getElementById('order-qty');
+    const notesEl = document.getElementById('order-notes');
+    const submitBtn = document.getElementById('order-submit-btn') || form.querySelector('button[type="submit"]');
+
+    const name  = (nameEl?.value  || '').trim();
+    const phone = (phoneEl?.value || '').trim();
+    const tableId = (tableEl?.value || '').trim();
+    const qty   = Math.max(1, parseInt(qtyEl?.value || '1') || 1);
+    const notes = (notesEl?.value || '').trim();
+
+    // Custom validation with toast
+    if (!name) {
+      showToast('يرجى إدخال اسمك الكامل', 'error');
+      try { nameEl && nameEl.focus(); } catch(_) {}
+      return;
+    }
+    if (!phone) {
+      showToast('يرجى إدخال رقم هاتفك للتواصل', 'error');
+      try { phoneEl && phoneEl.focus(); } catch(_) {}
+      return;
+    }
+    if (phone.replace(/[^0-9+]/g,'').length < 8) {
+      showToast('رقم الهاتف قصير جداً — تأكد من الرقم', 'error');
+      try { phoneEl && phoneEl.focus(); } catch(_) {}
+      return;
+    }
+
+    let tableObj = null;
+    if (tableId) {
+      const tables = getList('ew_tables');
+      const matched = tables.find(t => t.id == tableId);
+      if (matched) tableObj = { id: matched.id, table_number: matched.table_number };
+    }
+
+    const orderNumber = `ORD-${new Date().toISOString().slice(0,10).replace(/-/g,'')}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
+
+    const dishNameLocalized = currentLang === 'ar'
+      ? pickLocalizedText(selectedDish.name_ar, selectedDish.name_en, selectedDish.name)
+      : pickLocalizedText(selectedDish.name_en, selectedDish.name_ar, selectedDish.name);
+
+    // Backend-compatible payload per SubmitOrderRequest
+    const backendPayload = {
+      customer_name: name,
+      customer_phone: phone,
+      table_id: tableObj ? tableObj.id : null,
+      notes: notes || null,
+      items: [{
         dish_id: selectedDish.id,
-        dish_name: currentLang === 'ar'
-          ? pickLocalizedText(selectedDish.name_ar, selectedDish.name_en, selectedDish.name)
-          : pickLocalizedText(selectedDish.name_en, selectedDish.name_ar, selectedDish.name),
         quantity: qty,
-        price: selectedDish.price,
-        subtotal: selectedDish.price * qty
-      }
-    ]
+        special_instructions: notes || null,
+      }]
+    };
+    if (selectedDish.sizes && Array.isArray(selectedDish.sizes) && selectedDish.sizes.length) {
+      const defSize = selectedDish.sizes.find(s => s && s.is_default) || selectedDish.sizes[0];
+      if (defSize && defSize.id) backendPayload.items[0].dish_size_id = defSize.id;
+    }
+
+    // Lock UI during network
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.style.setProperty('opacity', '0.55', 'important');
+      submitBtn.style.setProperty('cursor', 'wait', 'important');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.dataset.orig = originalText;
+      submitBtn.innerHTML = `<span class="material-symbols-outlined" style="font-size:16px;">progress_activity</span> جارِ الإرسال...`;
+    }
+
+    const apiResult = await submitToApi('/orders', backendPayload);
+
+    const finalOrderNumber = (apiResult.ok && apiResult.data && apiResult.data.data && apiResult.data.data.order_number)
+      ? apiResult.data.data.order_number
+      : orderNumber;
+
+    // Save to localStorage (rich shape for admin LOCAL_DATABASE mode)
+    const newOrder = {
+      id: Date.now(),
+      order_number: finalOrderNumber,
+      customer_name: name,
+      customer_phone: phone,
+      table: tableObj,
+      status: 'pending',
+      total_amount: (Number(selectedDish.price) || 0) * qty,
+      created_at: new Date().toISOString(),
+      notes: notes,
+      synced: apiResult.ok ? 1 : 0,
+      api_error: apiResult.ok ? null : (apiResult.error?.message || 'offline'),
+      items: [{
+        dish_id: selectedDish.id,
+        dish_name: dishNameLocalized,
+        quantity: qty,
+        price: Number(selectedDish.price) || 0,
+        subtotal: (Number(selectedDish.price) || 0) * qty
+      }]
+    };
+    const orders = getList('ew_orders');
+    orders.unshift(newOrder);
+    setList('ew_orders', orders);
+
+    // Restore UI
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.style.removeProperty('opacity');
+      submitBtn.style.removeProperty('cursor');
+      if (submitBtn.dataset.orig) submitBtn.innerHTML = submitBtn.dataset.orig;
+    }
+
+    closeOrderModal();
+    form.reset();
+
+    if (apiResult.ok) {
+      showToast(`✅ تم تسجيل طلبك بنجاح! رقم الطلب: ${finalOrderNumber}`);
+    } else {
+      const msg = (apiResult.error && typeof apiResult.error.message === 'string' && apiResult.error.message.length < 80)
+        ? ` — ${apiResult.error.message}`
+        : '';
+      showToast(`✅ تم حفظ طلبك محلياً${msg}، رقم الطلب: ${finalOrderNumber}`, 'success', 5000);
+    }
   };
-
-  // Save to localStorage list of orders
-  const orders = getList('ew_orders');
-  orders.unshift(newOrder);
-  setList('ew_orders', orders);
-
-  closeOrderModal();
-  
-  // Show customized Toast message
-  const toastContainer = document.getElementById('toast');
-  if (toastContainer) {
-    const t = document.createElement('div');
-    t.className = 'toast-item toast-success';
-    t.innerHTML = `<span class="icon" style="font-size:18px;">check_circle</span>تم تسجيل طلبك بنجاح وسيصلك فوراً! رقم الطلب: ${newOrder.order_number}`;
-    toastContainer.appendChild(t);
-    setTimeout(() => t.remove(), 4000);
-  }
-});
+  form.removeEventListener('submit', window.__orderSubmitHandler || (()=>{}));
+  window.__orderSubmitHandler = newHandler;
+  form.addEventListener('submit', newHandler);
+})();
 
 // ─── 3D BURGER SCROLLYTELLING CANVAS ENGINE ───────────────────────────────
 const frameCount = 300;

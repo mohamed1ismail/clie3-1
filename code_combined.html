@@ -664,29 +664,29 @@ html{scroll-behavior:smooth;}
       </div>
       <p class="font-body-md text-body-md text-on-surface-variant max-w-sm">نضمن لك تجربة لا تُنسى مع تخصيص جميع التفاصيل حسب رغبتك.</p>
     </div>
-    <form class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
+    <form id="reservation-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
       <div class="flex flex-col gap-2">
         <label class="font-label-caps text-label-caps text-primary/80 uppercase tracking-wider pl-1">الاسم</label>
         <div class="relative border-b border-primary/40 focus-within:border-primary transition-colors">
-          <input type="text" placeholder="اسمك الكامل" class="w-full bg-surface-container-low/60 text-on-surface font-body-md text-body-md py-3 px-2 outline-none placeholder:text-on-surface-variant/40 focus:bg-surface-container-low transition-colors rounded-sm"/>
+          <input id="res-name" type="text" required placeholder="اسمك الكامل" class="w-full bg-surface-container-low/60 text-on-surface font-body-md text-body-md py-3 px-2 outline-none placeholder:text-on-surface-variant/40 focus:bg-surface-container-low transition-colors rounded-sm"/>
         </div>
       </div>
       <div class="flex flex-col gap-2">
         <label class="font-label-caps text-label-caps text-primary/80 uppercase tracking-wider pl-1">الهاتف</label>
         <div class="relative border-b border-primary/40 focus-within:border-primary transition-colors">
-          <input type="tel" placeholder="+966 50 000 0000" class="w-full bg-surface-container-low/60 text-on-surface font-body-md text-body-md py-3 px-2 outline-none placeholder:text-on-surface-variant/40 focus:bg-surface-container-low transition-colors rounded-sm"/>
+          <input id="res-phone" type="tel" required placeholder="+966 50 000 0000" class="w-full bg-surface-container-low/60 text-on-surface font-body-md text-body-md py-3 px-2 outline-none placeholder:text-on-surface-variant/40 focus:bg-surface-container-low transition-colors rounded-sm"/>
         </div>
       </div>
       <div class="flex flex-col gap-2">
         <label class="font-label-caps text-label-caps text-primary/80 uppercase tracking-wider pl-1">التاريخ</label>
         <div class="relative border-b border-primary/40 focus-within:border-primary transition-colors">
-          <input type="date" class="w-full bg-surface-container-low/60 text-on-surface font-body-md text-body-md py-3 px-2 outline-none focus:bg-surface-container-low transition-colors rounded-sm"/>
+          <input id="res-date" type="date" required class="w-full bg-surface-container-low/60 text-on-surface font-body-md text-body-md py-3 px-2 outline-none focus:bg-surface-container-low transition-colors rounded-sm"/>
         </div>
       </div>
       <div class="flex flex-col gap-2">
         <label class="font-label-caps text-label-caps text-primary/80 uppercase tracking-wider pl-1">عدد الضيوف</label>
         <div class="relative border-b border-primary/40 focus-within:border-primary transition-colors">
-          <select class="w-full bg-surface-container-low/60 text-on-surface font-body-md text-body-md py-3 px-2 outline-none focus:bg-surface-container-low transition-colors rounded-sm">
+          <select id="res-guests" class="w-full bg-surface-container-low/60 text-on-surface font-body-md text-body-md py-3 px-2 outline-none focus:bg-surface-container-low transition-colors rounded-sm">
             <option>2 ضيوف</option><option>3 ضيوف</option><option>4 ضيوف</option><option>5 ضيوف</option><option>6 ضيوف</option><option>7+ (غرفة خاصة)</option>
           </select>
         </div>
@@ -694,12 +694,12 @@ html{scroll-behavior:smooth;}
       <div class="flex flex-col gap-2 lg:col-span-4">
         <label class="font-label-caps text-label-caps text-primary/80 uppercase tracking-wider pl-1">متطلبات خاصة</label>
         <div class="relative border-b border-primary/40 focus-within:border-primary transition-colors">
-          <textarea rows="2" placeholder="مناسبة، قيود غذائية، تفضيلات جلوس…" class="w-full bg-surface-container-low/60 text-on-surface font-body-md text-body-md py-3 px-2 outline-none placeholder:text-on-surface-variant/40 focus:bg-surface-container-low transition-colors rounded-sm resize-none"></textarea>
+          <textarea id="res-notes" rows="2" placeholder="مناسبة، قيود غذائية، تفضيلات جلوس…" class="w-full bg-surface-container-low/60 text-on-surface font-body-md text-body-md py-3 px-2 outline-none placeholder:text-on-surface-variant/40 focus:bg-surface-container-low transition-colors rounded-sm resize-none"></textarea>
         </div>
       </div>
       <div class="lg:col-span-4 pt-4 flex items-center justify-between gap-4 flex-col sm:flex-row">
-        <p class="font-body-md text-body-md text-on-surface-variant/70 text-sm">سيقوم موظف الحجز بالتواصل معك خلال ٦٠ دقيقة.</p>
-        <button type="button" class="group relative overflow-hidden bg-primary text-on-primary px-10 py-4 font-label-caps text-label-caps uppercase tracking-widest transition-all duration-300 hover:scale-105 shadow-[0_0_20px_rgba(242,202,80,0.15)] hover:shadow-[0_0_30px_rgba(242,202,80,0.3)] rounded-sm flex items-center gap-3">
+        <p id="res-status-msg" class="font-body-md text-body-md text-on-surface-variant/70 text-sm">سيقوم موظف الحجز بالتواصل معك خلال ٦٠ دقيقة.</p>
+        <button id="res-submit-btn" type="submit" class="group relative overflow-hidden bg-primary text-on-primary px-10 py-4 font-label-caps text-label-caps uppercase tracking-widest transition-all duration-300 hover:scale-105 shadow-[0_0_20px_rgba(242,202,80,0.15)] hover:shadow-[0_0_30px_rgba(242,202,80,0.3)] rounded-sm flex items-center gap-3">
           <span class="relative z-10 flex items-center gap-3">
             <span class="material-symbols-outlined text-[18px]">send</span>
             تأكيد الحجز
@@ -782,36 +782,129 @@ html{scroll-behavior:smooth;}
   </div>
 </footer>
 
+<div id="toast" class="fixed top-24 left-1/2 -translate-x-1/2 z-[999] flex flex-col gap-2 pointer-events-none"></div>
+<style>
+  .toast-item{display:inline-flex;align-items:center;gap:10px;padding:14px 22px;border-radius:10px;font-weight:600;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,0.4);animation:toast-in 0.35s ease-out forwards;pointer-events:auto;}
+  .toast-success{background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;border:1px solid #22c55e;}
+  .toast-error{background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;border:1px solid #ef4444;}
+  .toast-item .icon{font-family:'Material Symbols Outlined';font-variation-settings:'FILL' 1;}
+  @keyframes toast-in{from{opacity:0;transform:translateY(-20px) scale(0.92);}to{opacity:1;transform:translateY(0) scale(1);}}
+</style>
 <script>
+  const API_BASE = typeof window.API_BASE_URL !== 'undefined' ? window.API_BASE_URL : 'http://localhost:8000/api';
+  const getList = (k) => JSON.parse(localStorage.getItem(k) || '[]');
+  const setList = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+  const getObj  = (k) => JSON.parse(localStorage.getItem(k) || '{}');
+
+  function showToast(msg, type = 'success') {
+    const container = document.getElementById('toast');
+    if (!container) return;
+    const t = document.createElement('div');
+    t.className = `toast-item toast-${type}`;
+    const icon = type === 'success' ? 'check_circle' : 'error';
+    t.innerHTML = `<span class="icon">${icon}</span>${msg}`;
+    container.appendChild(t);
+    setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(-20px)'; t.style.transition='all 0.3s'; }, 3700);
+    setTimeout(() => t.remove(), 4200);
+  }
+
+  async function submitToApi(endpoint, payload) {
+    try {
+      const res = await fetch(`${API_BASE}${endpoint}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) { const err = await res.json().catch(() => ({})); throw err; }
+      return { ok: true, data: await res.json() };
+    } catch (e) {
+      return { ok: false, error: e };
+    }
+  }
+
   // Rating ring animation on scroll
   document.addEventListener('DOMContentLoaded', () => {
     const target = document.getElementById('rating-number');
-    if (!target) return;
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const circle = document.getElementById('rating-circle');
-          const percent = 98;
-          const circumference = 2 * Math.PI * 45;
-          const offset = circumference - (percent / 100) * circumference;
-          if (circle) circle.style.strokeDashoffset = offset;
-          const numberEl = document.getElementById('rating-number');
-          let current = 0;
-          const targetVal = 4.9;
-          const duration = 1500;
-          const steps = 60;
-          const stepTime = duration / steps;
-          const increment = targetVal / steps;
-          const timer = setInterval(() => {
-            current += increment;
-            if (current >= targetVal) { current = targetVal; clearInterval(timer); }
-            if (numberEl) numberEl.textContent = current.toFixed(1);
-          }, stepTime);
-          observer.disconnect();
+    if (target) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const circle = document.getElementById('rating-circle');
+            const percent = 98;
+            const circumference = 2 * Math.PI * 45;
+            const offset = circumference - (percent / 100) * circumference;
+            if (circle) circle.style.strokeDashoffset = offset;
+            const numberEl = document.getElementById('rating-number');
+            let current = 0;
+            const targetVal = 4.9;
+            const duration = 1500;
+            const steps = 60;
+            const stepTime = duration / steps;
+            const increment = targetVal / steps;
+            const timer = setInterval(() => {
+              current += increment;
+              if (current >= targetVal) { current = targetVal; clearInterval(timer); }
+              if (numberEl) numberEl.textContent = current.toFixed(1);
+            }, stepTime);
+            observer.disconnect();
+          }
+        });
+      }, { threshold: 0.5 });
+      observer.observe(target);
+    }
+
+    const resForm = document.getElementById('reservation-form');
+    if (resForm) {
+      resForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('res-submit-btn');
+        const statusMsg = document.getElementById('res-status-msg');
+        const name  = document.getElementById('res-name').value.trim();
+        const phone = document.getElementById('res-phone').value.trim();
+        const date  = document.getElementById('res-date').value;
+        const guests= document.getElementById('res-guests').value;
+        const notes = document.getElementById('res-notes').value.trim();
+
+        if (!name || !phone || !date) {
+          showToast('يرجى إكمال جميع الحقول المطلوبة', 'error');
+          return;
         }
+
+        const resNumber = 'RES-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-' + Math.random().toString(36).substr(2, 4).toUpperCase();
+        const payload = {
+          order_number: resNumber,
+          customer_name: name,
+          customer_phone: phone,
+          notes: `[حجز طاولة] التاريخ: ${date} | عدد الضيوف: ${guests}` + (notes ? ` | ${notes}` : ''),
+          total_amount: 0,
+          status: 'pending',
+          payment_status: 'pending',
+          items: [{
+            dish_id: 1,
+            quantity: 1,
+            special_instructions: `حجز طاولة - ${date} - ${guests}`
+          }]
+        };
+
+        if (btn) { btn.disabled = true; btn.style.opacity = '0.7'; }
+        if (statusMsg) statusMsg.textContent = 'جاري إرسال طلب الحجز…';
+
+        const apiRes = await submitToApi('/orders', payload);
+        const reservations = getList('ew_reservations');
+        reservations.unshift({
+          id: Date.now(), reservation_number: resNumber, name, phone, date, guests, notes,
+          status: 'confirmed', created_at: new Date().toISOString(),
+          synced: apiRes.ok ? 1 : 0
+        });
+        setList('ew_reservations', reservations);
+
+        if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+        if (statusMsg) statusMsg.textContent = 'سيقوم موظف الحجز بالتواصل معك خلال ٦٠ دقيقة.';
+
+        resForm.reset();
+        showToast(`تم استلام الحجز بنجاح! رقم الحجز: ${resNumber}`, 'success');
       });
-    }, { threshold: 0.5 });
-    observer.observe(target);
+    }
   });
 </script>
 </body></html>
