@@ -55,15 +55,15 @@ class DishController extends Controller
         $sizes = $data['sizes'] ?? null;
         unset($data['sizes']); // sizes are saved separately
 
-        $hasLocalizedName = !empty($data['name_ar']) || !empty($data['name_en']);
-        $hasLocalizedDescription = !empty($data['description_ar']) || !empty($data['description_en']);
+        $nameValue = trim((string) ($data['name_ar'] ?? $data['name_en'] ?? $data['name'] ?? ''));
+        $descriptionValue = trim((string) ($data['description_ar'] ?? $data['description_en'] ?? $data['description'] ?? ''));
 
-        if ($hasLocalizedName) {
-            $data['name'] = '';
+        if ($nameValue !== '') {
+            $data['name'] = $nameValue;
         }
 
-        if ($hasLocalizedDescription) {
-            $data['description'] = '';
+        if ($descriptionValue !== '') {
+            $data['description'] = $descriptionValue;
         }
 
         $data['slug'] = $data['slug'] ?? Str::slug($data['name'] ?: ($data['name_ar'] ?: ($data['name_en'] ?: 'dish')));
@@ -97,15 +97,15 @@ class DishController extends Controller
         $sizes = $data['sizes'] ?? null;
         unset($data['sizes']);
 
-        $hasLocalizedName = !empty($data['name_ar']) || !empty($data['name_en']);
-        $hasLocalizedDescription = !empty($data['description_ar']) || !empty($data['description_en']);
+        $nameValue = trim((string) ($data['name_ar'] ?? $data['name_en'] ?? $data['name'] ?? $dish->name ?? ''));
+        $descriptionValue = trim((string) ($data['description_ar'] ?? $data['description_en'] ?? $data['description'] ?? $dish->description ?? ''));
 
-        if ($hasLocalizedName) {
-            $data['name'] = '';
+        if ($nameValue !== '') {
+            $data['name'] = $nameValue;
         }
 
-        if ($hasLocalizedDescription) {
-            $data['description'] = '';
+        if ($descriptionValue !== '') {
+            $data['description'] = $descriptionValue;
         }
 
         if (isset($data['name']) && empty($data['slug'])) {
