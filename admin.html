@@ -1591,13 +1591,15 @@ function renderDishes(dishes) {
 }
 
 function openDishModal(data = null) {
+  const localeText = (value) => typeof value === 'string' ? value : (value ?? '');
+
   document.getElementById('dish-id').value = data?.id || '';
-  document.getElementById('dish-name-ar').value = data?.name_ar || data?.name || '';
-  document.getElementById('dish-name-en').value = data?.name_en || data?.name || '';
+  document.getElementById('dish-name-ar').value = localeText(data?.name_ar);
+  document.getElementById('dish-name-en').value = localeText(data?.name_en);
   document.getElementById('dish-category').value = data?.category_id || '';
   document.getElementById('dish-price').value = data?.price || '';
-  document.getElementById('dish-desc-ar').value = data?.description_ar || data?.description || '';
-  document.getElementById('dish-desc-en').value = data?.description_en || data?.description || '';
+  document.getElementById('dish-desc-ar').value = localeText(data?.description_ar);
+  document.getElementById('dish-desc-en').value = localeText(data?.description_en);
   document.getElementById('dish-calories').value = data?.calories || '';
   document.getElementById('dish-prep').value = data?.prep_time_minutes || '';
   document.getElementById('dish-available').checked = data ? data.is_available : true;
@@ -1653,11 +1655,13 @@ async function saveDish() {
   fd.append('description_ar', descAr);
   fd.append('description_en', descEn);
 
-  // Keep the generic fields neutral so they do not force one language into another.
-  const fallbackName = nameAr || nameEn || '';
-  const fallbackDescription = descAr || descEn || '';
-  fd.append('name', fallbackName);
-  fd.append('description', fallbackDescription);
+  // Keep the generic fields neutral when bilingual values are present.
+  // This avoids Arabic being copied into English or vice versa on edit/save.
+  if (!nameAr && !nameEn) { fd.append('name', ''); }
+  else { fd.append('name', ''); }
+
+  if (!descAr && !descEn) { fd.append('description', ''); }
+  else { fd.append('description', ''); }
 
   fd.append('category_id',     document.getElementById('dish-category').value);
   fd.append('price',           document.getElementById('dish-price').value);
