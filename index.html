@@ -19,7 +19,16 @@ html{scroll-behavior:smooth;}
 @keyframes mspin{to{transform:rotate(360deg);}}
 
 .hero-copy{
-  display:none !important;
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:40px;
+  z-index:2;
+  display:flex;
+  justify-content:flex-start;
+  align-items:flex-end;
+  padding-left:32px;
+  padding-right:32px;
 }
 
 .hero-copy-inner{
@@ -203,7 +212,11 @@ html.is-mobile-view .hero-copy{
 }
 
 html.is-mobile-view .mobile-hero-copy{
-  display:none !important;
+  display:flex !important;
+  flex-direction:column;
+  padding-inline:8px;
+  overflow:hidden;
+  pointer-events:none;
 }
 
 html.is-mobile-view .mobile-hero-copy .brand-panel{
@@ -420,7 +433,11 @@ html.is-mobile-view #menu{
   }
 
   .mobile-hero-copy{
-    display:none !important;
+    display:flex !important;
+    flex-direction:column;
+    padding-inline:8px;
+    overflow:hidden;
+    pointer-events:none;
   }
 
   .mobile-hero-copy .brand-panel{
